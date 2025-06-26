@@ -3,13 +3,21 @@
     วรเพชร  เรืองพรวิสุทธิ์
     09/01/2567
 """
-
+from fastapi.middleware.cors import CORSMiddleware
 import sys
 from ThaiCIDHelper  import *
 from DataThaiCID    import *
 from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Your Next.js dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # สร้าง Instance Class ThaiCIDHelper
 reader = ThaiCIDHelper(APDU_SELECT,APDU_THAI_CARD)

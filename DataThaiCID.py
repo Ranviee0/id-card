@@ -133,13 +133,13 @@ APDU_DATA=[
         'type': ThaiCIDDataType.ADDRESS
         },
 
-    # {
-    #     'key':'APDU_RELIGION', 
-    #     'id':'RELIGION',
-    #     'desc': 'ศาสนา',
-    #     'apdu':[0x80, 0xb0, 0x01, 0x77, 0x02, 0x00, 0x02],
-    #     'type': ThaiCIDDataType.RELIGION
-    #     },
+    {
+        'key':'APDU_RELIGION', 
+        'id':'RELIGION',
+        'desc': 'ศาสนา',
+        'apdu':[0x80, 0xb0, 0x01, 0x77, 0x02, 0x00, 0x02],
+        'type': ThaiCIDDataType.RELIGION
+        },
 
     {
         'key':'APDU_DOCNO', 
