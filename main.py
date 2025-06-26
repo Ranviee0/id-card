@@ -12,15 +12,18 @@ from DataThaiCID    import *
 reader = ThaiCIDHelper(APDU_SELECT,APDU_THAI_CARD)
 
 # Connect SMC
-response = reader.connectReader(0)
-print(f'Reader: Connected [{reader.cardReaderIndex}]... [{response[0]}]') # .component.reader
+connection, status = reader.connectReader(0)
 
-# response value >> 0 = Reader as Connection , Connected Status ??
-if response[1] == True:
-    # Read Data
-    reader.readData()
+if status:
+    data = reader.readData()
+    print("📄 Thai Description Text:")
+    print(data["thaiText"])
+    
+    print("\n🧾 JSON Text:")
+    print(data["jsonText"])
+    
+    print("\n🔑 JSON as Dictionary:")
+    print(data["jsonData"])  # You can also access specific fields: data["jsonData"]["fname"]
 else:
-    print(f'Error: {reader.lastError}')
-    sys.exit()    
-
-sys.exit()
+    print(f'❌ Error: {reader.lastError}')
+    sys.exit(1)

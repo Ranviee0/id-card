@@ -195,6 +195,13 @@ class ThaiCIDHelper():
         elapsed_str  = time.strftime("%S.{}".format(str(elapsed_time % 1)[2:])[:6], time.gmtime(elapsed_time))
 
         print(f"Reader: อ่านข้อมูล เสร็จแล้ว... [{elapsed_str} ms]")
+
+        return {
+            "thaiText": _textThaiDesc,
+            "jsonText": _textJson,
+            "jsonData": _Json4Dev
+        }
+
         
 
 ####- --------------------------------------------------    
