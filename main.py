@@ -8,6 +8,8 @@ import sys
 from ThaiCIDHelper  import *
 from DataThaiCID    import *
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+import io
 
 app = FastAPI()
 
@@ -58,3 +60,30 @@ def read_citizen_data():
     else:
         raise HTTPException(status_code=404, detail=f"No card detected or reader connection failed: {reader.lastError}")
 
+
+@app.get("/read-photo")
+def read_citizen_photo():
+    reader = ThaiCIDHelper()
+
+    if not reader.cardReaderList:
+        raise HTTPException(status_code=404, detail="No card reader found.")
+
+    connection, status = reader.connectReader(0)
+
+    if status and reader.cardReader is not None:
+        try:
+            # SELECT + TYPE (same as in readData)
+            reader.cardReader.transmit(reader.apduSELECT + reader.apduTHCard)
+
+            photo_bytes = []
+            for photo_data in APDU_PHOTO:
+                apdu = searchAPDUPhoto(photo_data['key'])
+                photo_bytes += reader.getPhoto(apdu)
+
+            image_bytes = bytes(photo_bytes)
+            return StreamingResponse(io.BytesIO(image_bytes), media_type="image/jpeg")
+        
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Photo reading failed: {str(e)}")
+    else:
+        raise HTTPException(status_code=404, detail=f"No card detected or reader connection failed: {reader.lastError}")
