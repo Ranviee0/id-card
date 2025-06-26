@@ -7,7 +7,7 @@
 import sys
 from ThaiCIDHelper  import *
 from DataThaiCID    import *
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
@@ -37,7 +37,7 @@ def read_citizen_data():
     reader = ThaiCIDHelper()
 
     if not reader.cardReaderList:
-        return {"error": "No card reader found."}
+        raise HTTPException(status_code=404, detail="No card reader found.")
 
     connection, status = reader.connectReader(0)
 
@@ -46,6 +46,7 @@ def read_citizen_data():
             data = reader.readData(readPhoto=False)
             return data["jsonData"]
         except Exception as e:
-            return {"error": f"Reading failed: {str(e)}"}
+            raise HTTPException(status_code=500, detail=f"Reading failed: {str(e)}")
     else:
-        return {"error": f"Connection failed: {reader.lastError}"}
+        raise HTTPException(status_code=404, detail=f"No card detected or reader connection failed: {reader.lastError}")
+
