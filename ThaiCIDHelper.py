@@ -98,8 +98,8 @@ class ThaiCIDHelper():
 ####- --------------------------------------------------    
 
     def readData(self,readPhoto=True,
-                 saveText : SaveType = SaveType.FILE,
-                 savePhoto: SaveType = SaveType.FILE):
+                 saveText : SaveType = SaveType.NONE,
+                 savePhoto: SaveType = SaveType.NONE):
         """
             readData อ่านข้อมูลจากบัตร ตาม apdu ที่กำหนด \n
             พารามิเตอร์ : \n
