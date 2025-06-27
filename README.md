@@ -28,17 +28,63 @@ python start_server.py
 
 ---
 
-## 🔧 Building Standalone Executable
+## 🧰 Step 1: Create and Activate Virtual Environment
 
-Use `PyInstaller`:
+### 🐧 Linux / macOS
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 🪟 Windows
+
+```cmd
+python -m venv venv
+venv\Scripts\activate
+```
+
+---
+
+## 📦 Step 2: Install Dependencies
+
+Ensure `requirements.txt` contains:
+
+```
+fastapi
+uvicorn
+```
+
+Then install:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 🚀 Step 3: Run the App
+
+You can either run it manually:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8005
+```
+
+Or use the tkinter GUI:
+
+```bash
+python start_server.py
+```
+
+---
+
+## 🔧 Step 4: Build Executable with PyInstaller
+
+(Outside venv or with system Python due to pyscard limitations)
 
 ```bash
 pip install pyinstaller
-```
-
-Then run:
-
-```bash
 pyinstaller --onefile --windowed \
   --hidden-import=fastapi.middleware.cors \
   --hidden-import=fastapi.middleware \
@@ -54,40 +100,9 @@ pyinstaller --onefile --windowed \
   start_server.py
 ```
 
-Result:
-
-```
-dist/start_server     # Linux
-dist/start_server.exe # Windows
-```
-
 ---
 
-## ⚠️ Troubleshooting
+## ⚠️ Notes
 
-- ❌ `ModuleNotFoundError: No module named 'smartcard'`  
-  → Ensure `pyscard` is installed globally.
-
-- 🐧 On Linux, make sure you have PC/SC daemon and readers installed:
-  ```bash
-  sudo apt install pcscd libpcsclite1
-  sudo systemctl start pcscd
-  ```
-
-- 🪟 On Windows, install appropriate smartcard drivers.
-
----
-
-## 📚 References
-
-- [FastAPI Docs](https://fastapi.tiangolo.com)
-- [pyscard Docs](https://pyscard.sourceforge.io/)
-- [PC/SC Overview](https://pcsclite.apdu.fr/)
-
----
-
-## 👨‍💼 Author
-
-Woraphet Rueangpornvisut  
-📅 Updated: Jan 2024  
-📄 Python 3.11.5
+- `pyscard` does **not bundle well in venv** — use global install for building.
+- Make sure your smartcard drivers are available on your platform.
