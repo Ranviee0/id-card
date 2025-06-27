@@ -1,72 +1,93 @@
-# 🚀 Build and Package FastAPI ThaiCID Reader App
+## 🛠️ Installation
 
-This guide explains how to set up a Python virtual environment, install dependencies, and compile your FastAPI app into a standalone executable using PyInstaller.
-
----
-
-## ✅ 1. Create and Activate a Virtual Environment
+> ❗ Note: `pyscard` must be installed **globally**, not in a virtual environment.
 
 ```bash
-python3 -m venv venv
-# Activate the environment
+pip install pyscard==2.0.7 fastapi uvicorn
+```
 
-# For Linux/macOS:
-source venv/bin/activate
+Test `pyscard` installation:
 
-# For Windows:
-venv\Scripts\activate
+```bash
+python3 -c "from smartcard.System import readers; print(readers())"
 ```
 
 ---
 
-## ✅ 2. Install Required Python Packages from `requirements.txt`
+## 🧪 Running the Server (for development)
 
 ```bash
-pip install -r requirements.txt
+uvicorn main:app --reload --port 8005
+```
+
+Or via the GUI:
+
+```bash
+python start_server.py
 ```
 
 ---
 
-## ✅ 3. Install System-Level Dependencies (if not already installed)
+## 🔧 Building Standalone Executable
 
-Some packages like `pyscard` require additional system libraries.
-
-### 🐧 For Fedora / RHEL / CentOS:
+Use `PyInstaller`:
 
 ```bash
-sudo dnf install pcsc-lite-devel swig gcc python3-devel
+pip install pyinstaller
 ```
 
-### 🐧 For Ubuntu / Debian:
+Then run:
 
 ```bash
-sudo apt install libpcsclite-dev swig build-essential python3-dev
+pyinstaller --onefile --windowed \
+  --hidden-import=fastapi.middleware.cors \
+  --hidden-import=fastapi.middleware \
+  --hidden-import=fastapi \
+  --hidden-import=uvicorn \
+  --hidden-import=pyscard \
+  --hidden-import=smartcard.System \
+  --hidden-import=smartcard.util \
+  --collect-submodules=smartcard \
+  --add-data "main.py:." \
+  --add-data "DataThaiCID.py:." \
+  --add-data "ThaiCIDHelper.py:." \
+  start_server.py
+```
+
+Result:
+
+```
+dist/start_server     # Linux
+dist/start_server.exe # Windows
 ```
 
 ---
 
-## ✅ 4. Compile the App into a Standalone Executable
+## ⚠️ Troubleshooting
 
-```bash
-pyinstaller --onefile start_server.py
-```
+- ❌ `ModuleNotFoundError: No module named 'smartcard'`  
+  → Ensure `pyscard` is installed globally.
 
-> 🔒 Optional: Add hidden imports if needed
+- 🐧 On Linux, make sure you have PC/SC daemon and readers installed:
+  ```bash
+  sudo apt install pcscd libpcsclite1
+  sudo systemctl start pcscd
+  ```
 
-```bash
-pyinstaller --onefile --hidden-import=smartcard start_server.py
-```
+- 🪟 On Windows, install appropriate smartcard drivers.
+
+---
+
+## 📚 References
+
+- [FastAPI Docs](https://fastapi.tiangolo.com)
+- [pyscard Docs](https://pyscard.sourceforge.io/)
+- [PC/SC Overview](https://pcsclite.apdu.fr/)
 
 ---
 
-## ✅ 5. Run the Compiled Binary
+## 👨‍💼 Author
 
-```bash
-./dist/start_server       # Linux/macOS
-dist\start_server.exe    # Windows
-```
-
-Your FastAPI server will be available at:  
-**http://localhost:8005**
-
----
+Woraphet Rueangpornvisut  
+📅 Updated: Jan 2024  
+📄 Python 3.11.5
