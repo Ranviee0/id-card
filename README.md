@@ -55,6 +55,11 @@ fastapi
 uvicorn
 ```
 
+in Windows pyscard can be one of the requirements
+```
+pyscard
+```
+
 Then install:
 
 ```bash
@@ -81,7 +86,7 @@ python start_server.py
 
 ## 🔧 Step 4: Build Executable with PyInstaller
 
-(Outside venv or with system Python due to pyscard limitations)
+(With venv)
 
 ```bash
 pip install pyinstaller
@@ -100,9 +105,14 @@ pyinstaller --onefile --windowed \
   start_server.py
 ```
 
+```powershell
+pyinstaller --onefile --hidden-import=fastapi.middleware.cors --hidden-import=fastapi.middleware --hidden-import=fastapi --hidden-import=uvicorn --hidden-import=pyscard --hidden-import=smartcard.System --hidden-import=smartcard.util --collect-submodules=smartcard --add-data "main.py;." --add-data "DataThaiCID.py;." --add-data "ThaiCIDHelper.py;." start_server.py
+```
+
 ---
 
 ## ⚠️ Notes
 
 - `pyscard` does **not bundle well in venv** — use global install for building.
+- However, `pyscard` works perfectly on venv(s) in Windows.
 - Make sure your smartcard drivers are available on your platform.
