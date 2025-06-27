@@ -19,12 +19,12 @@ def start_server():
     status_label.config(text="Server running at http://localhost:8005")
 
 root = tk.Tk()
-root.title("FastAPI Server Controller")
+root.title("ID Card Reader Server")
 
 frame = tk.Frame(root, padx=20, pady=20)
 frame.pack()
 
-start_button = tk.Button(frame, text="Start FastAPI Server", command=start_server)
+start_button = tk.Button(frame, text="Start Server", command=start_server)
 start_button.pack(pady=10)
 
 status_label = tk.Label(frame, text="Server not running.")
