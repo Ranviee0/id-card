@@ -115,4 +115,4 @@ pyinstaller --onefile --hidden-import=fastapi.middleware.cors --hidden-import=fa
 
 - `pyscard` does **not bundle well in venv** — use global install for building.
 - However, `pyscard` works perfectly on venv(s) in Windows.
-- Make sure your smartcard drivers are available on your platform.
+- Make sure your smartcard drivers are available on your platform..
