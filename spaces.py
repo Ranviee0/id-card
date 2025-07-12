@@ -75,23 +75,31 @@ def parse_thai_name(fullname_th: str):
 
 def parse_english_name(fullname_en: str):
     for title in sorted(english_titles, key=len, reverse=True):
+        # Handle with dot, space, or joined directly (e.g., "MissSupharom")
         if fullname_en.startswith(title + ".") or fullname_en.startswith(title + " "):
             name_without_title = fullname_en[len(title):].strip(" .")
-            parts = name_without_title.split(maxsplit=1)
-            if len(parts) == 2:
-                return {
-                    "title_en": title,
-                    "first_name_en": parts[0],
-                    "last_name_en": parts[1],
-                    "full_name_en": f"{title} {parts[0]} {parts[1]}"
-                }
-            else:
-                return {
-                    "title_en": title,
-                    "first_name_en": name_without_title,
-                    "last_name_en": "",
-                    "full_name_en": f"{title} {name_without_title}"
-                }
+        elif fullname_en.startswith(title):
+            name_without_title = fullname_en[len(title):].strip()
+        else:
+            continue
+
+        parts = name_without_title.split(maxsplit=1)
+        if len(parts) == 2:
+            return {
+                "title_en": title,
+                "first_name_en": parts[0],
+                "last_name_en": parts[1],
+                "full_name_en": f"{title} {parts[0]} {parts[1]}"
+            }
+        else:
+            return {
+                "title_en": title,
+                "first_name_en": name_without_title,
+                "last_name_en": "",
+                "full_name_en": f"{title} {name_without_title}"
+            }
+
+    # fallback
     return {
         "title_en": "",
         "first_name_en": fullname_en,

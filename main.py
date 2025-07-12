@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 import io
 from spaces import parse_thai_name, parse_english_name
+from address import parse_thai_address
 
 app = FastAPI()
 
@@ -71,6 +72,14 @@ def read_citizen_data():
                 data_dict["title_en"] = eng_result["title_en"]
                 data_dict["first_name_en"] = eng_result["first_name_en"]
                 data_dict["last_name_en"] = eng_result["last_name_en"]
+            
+            if "ADDRESS" in data_dict:
+                addr_result = parse_thai_address(data_dict["ADDRESS"])
+                data_dict["address_clean"] = addr_result["address"]
+                data_dict["subdistrict"] = addr_result["subdistrict"]
+                data_dict["district"] = addr_result["district"]
+                data_dict["province"] = addr_result["province"]
+                data_dict["is_bangkok"] = addr_result["is_bangkok"]
 
             return data_dict
         except Exception as e:
