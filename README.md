@@ -106,7 +106,7 @@ pyinstaller --onefile --windowed \
 ```
 
 ```powershell
-pyinstaller --onefile --hidden-import=fastapi.middleware.cors --hidden-import=fastapi.middleware --hidden-import=fastapi --hidden-import=uvicorn --hidden-import=pyscard --hidden-import=smartcard.System --hidden-import=smartcard.util --collect-submodules=smartcard --add-data "main.py;." --add-data "DataThaiCID.py;." --add-data "ThaiCIDHelper.py;." start_server.py
+pyinstaller --onefile --hidden-import=fastapi.middleware.cors --hidden-import=fastapi.middleware --hidden-import=fastapi --hidden-import=uvicorn --hidden-import=pyscard --hidden-import=smartcard.System --hidden-import=smartcard.util --collect-submodules=smartcard --add-data "main.py;." --add-data "DataThaiCID.py;." --add-data "ThaiCIDHelper.py;." --add-data "spaces.py;." start_server.py
 ```
 
 ---

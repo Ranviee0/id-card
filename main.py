@@ -10,6 +10,7 @@ from DataThaiCID    import *
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 import io
+from spaces import parse_thai_name, parse_english_name
 
 app = FastAPI()
 
@@ -54,7 +55,24 @@ def read_citizen_data():
     if status and reader.cardReader is not None:
         try:
             data = reader.readData(readPhoto=False)
-            return data["jsonData"]
+
+            data_dict = data["jsonData"]
+
+            if "FULLNAME-TH" in data_dict:
+                thai_result = parse_thai_name(data_dict["FULLNAME-TH"])
+                data_dict["FULLNAME-TH"] = thai_result["full_name_th"]
+                data_dict["title_th"] = thai_result["title_th"]
+                data_dict["first_name_th"] = thai_result["first_name_th"]
+                data_dict["last_name_th"] = thai_result["last_name_th"]
+
+            if "FULLNAME-EN" in data_dict:
+                eng_result = parse_english_name(data_dict["FULLNAME-EN"])
+                data_dict["FULLNAME-EN"] = eng_result["full_name_en"]
+                data_dict["title_en"] = eng_result["title_en"]
+                data_dict["first_name_en"] = eng_result["first_name_en"]
+                data_dict["last_name_en"] = eng_result["last_name_en"]
+
+            return data_dict
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Reading failed: {str(e)}")
     else:
