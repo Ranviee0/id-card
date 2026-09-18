@@ -86,28 +86,16 @@ python start_server.py
 
 ## 🔧 Step 4: Build Executable with PyInstaller
 
-(With venv)
+(With venv active)
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed \
-  --hidden-import=fastapi.middleware.cors \
-  --hidden-import=fastapi.middleware \
-  --hidden-import=fastapi \
-  --hidden-import=uvicorn \
-  --hidden-import=pyscard \
-  --hidden-import=smartcard.System \
-  --hidden-import=smartcard.util \
-  --collect-submodules=smartcard \
-  --add-data "main.py:." \
-  --add-data "DataThaiCID.py:." \
-  --add-data "ThaiCIDHelper.py:." \
-  start_server.py
+pyinstaller --onefile --windowed --noconfirm --name IDCardServer --icon icon.ico --add-data "icon.ico;." start_server.py
 ```
 
-```powershell
-pyinstaller --onefile --hidden-import=fastapi.middleware.cors --hidden-import=fastapi.middleware --hidden-import=fastapi --hidden-import=uvicorn --hidden-import=pyscard --hidden-import=smartcard.System --hidden-import=smartcard.util --collect-submodules=smartcard --add-data "main.py;." --add-data "DataThaiCID.py;." --add-data "ThaiCIDHelper.py;." --add-data "spaces.py;." start_server.py
-```
+`icon.ico` is generated from `icon.png` (padded to square, white corners made transparent, 16–256 px). On Linux/macOS use `--add-data "icon.ico:."`.
+
+Output: `dist/IDCardServer.exe`. No `--hidden-import` / `--add-data` flags are needed: `start_server.py` imports `main` directly, so PyInstaller finds every module on its own.
 
 ---
 

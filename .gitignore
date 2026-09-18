@@ -4,5 +4,5 @@ __pycache__/
 env/
 build/
 dist/
-venv/
+.venv/
 start_server.spec

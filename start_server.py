@@ -15,7 +15,11 @@ def is_port_in_use(port, host="127.0.0.1"):
         return s.connect_ex((host, port)) == 0
 
 def run_server():
-    uvicorn.run("main:app", host="0.0.0.0", port=8005, reload=False)
+    # Import here (not as a "main:app" string) so PyInstaller bundles main and its imports.
+    # Deferred so the card reader isn't opened until the server is started.
+    from main import app
+    # log_config=None: in a --windowed build sys.stdout is None and uvicorn's default logging crashes.
+    uvicorn.run(app, host="0.0.0.0", port=8005, reload=False, log_config=None)
 
 def start_server():
     if is_port_in_use(8005):
@@ -30,6 +34,11 @@ def start_server():
 
 root = tk.Tk()
 root.title("ID Card Reader Server")
+icon_dir = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
+try:
+    root.iconbitmap(os.path.join(icon_dir, "icon.ico"))
+except tk.TclError:
+    pass  # Missing icon shouldn't stop the server GUI
 
 frame = tk.Frame(root, padx=20, pady=20)
 frame.pack()

@@ -1,11 +1,14 @@
+import re
+
 english_titles = [
-    'Mr', 'Miss', 'Mrs', 'Ms', 'Dr', 'Prof', 'Sir', 'Madam',
+    'Mr', 'Miss', 'Mrs', 'Ms', 'Master', 'Dr', 'Prof', 'Sir', 'Madam',
     'Captain', 'Colonel', 'Major', 'General'
 ]
 
 thai_titles = [
     # Civilian titles
     'นาย', 'น.ส.', 'นาง', 'นางสาว', 'ดร.', 'ศ.', 'รศ.', 'ผศ.',
+    'ด.ช.', 'ด.ญ.', 'เด็กชาย', 'เด็กหญิง',  # Children (under 15)
         
     # Police ranks (from highest to lowest)
     'พล.ต.อ.', 'พล.ต.ท.', 'พล.ต.ต.',  # Police Generals
@@ -47,63 +50,57 @@ thai_titles = [
     'อธิบดี', 'ผู้อำนวยการ', 'หัวหน้า'
 ]
 
-def parse_thai_name(fullname_th: str):
-    for title in sorted(thai_titles, key=len, reverse=True):
-        if fullname_th.startswith(title):
-            name_without_title = fullname_th[len(title):].strip()
-            parts = name_without_title.split(maxsplit=1)
-            if len(parts) == 2:
-                return {
-                    "title_th": title,
-                    "first_name_th": parts[0],
-                    "last_name_th": parts[1],
-                    "full_name_th": f"{title} {parts[0]} {parts[1]}"
-                }
-            else:
-                return {
-                    "title_th": title,
-                    "first_name_th": name_without_title,
-                    "last_name_th": "",
-                    "full_name_th": f"{title} {name_without_title}"
-                }
+def _titles_alternation(titles):
+    # Longest first so e.g. 'นางสาว' wins over 'นาง', 'Miss' over 'Mr'
+    return "|".join(re.escape(t) for t in sorted(titles, key=len, reverse=True))
+
+# Title may be joined to the name ("ด.ช.นาริน", "MasterNarin") or separated by space/dot.
+# Thai also accepts any dotted abbreviation (e.g. ด.ช., น.ส., พล.ต.อ.) even if it's not in the list.
+THAI_NAME_RE = re.compile(
+    rf"^(?P<title>{_titles_alternation(thai_titles)}|(?:[ก-ฮ]{{1,3}}\.)+)?\s*"
+    r"(?P<first>\S+)(?:\s+(?P<last>.+))?$"
+)
+ENGLISH_NAME_RE = re.compile(
+    rf"^(?:(?P<title>{_titles_alternation(english_titles)})\.?\s*)?"
+    r"(?P<first>\S+)(?:\s+(?P<last>.+))?$"
+)
+
+def _parse_name(fullname: str, pattern, lang: str):
+    fullname = " ".join(fullname.split())
+    match = pattern.match(fullname)
+    if not match:
+        return {
+            f"title_{lang}": "",
+            f"first_name_{lang}": fullname,
+            f"last_name_{lang}": "",
+            f"full_name_{lang}": fullname
+        }
+    title = match.group("title") or ""
+    first = match.group("first")
+    last = match.group("last") or ""
     return {
-        "title_th": "",
-        "first_name_th": fullname_th,
-        "last_name_th": "",
-        "full_name_th": fullname_th
+        f"title_{lang}": title,
+        f"first_name_{lang}": first,
+        f"last_name_{lang}": last,
+        f"full_name_{lang}": " ".join(p for p in (title, first, last) if p)
     }
+
+# Abbreviated titles returned in their full form
+THAI_TITLE_EXPANSIONS = {
+    'ด.ช.': 'เด็กชาย',
+    'ด.ญ.': 'เด็กหญิง',
+}
+
+def parse_thai_name(fullname_th: str):
+    result = _parse_name(fullname_th, THAI_NAME_RE, "th")
+    title = THAI_TITLE_EXPANSIONS.get(result["title_th"])
+    if title:
+        result["title_th"] = title
+        result["full_name_th"] = " ".join(
+            p for p in (title, result["first_name_th"], result["last_name_th"]) if p
+        )
+    return result
 
 def parse_english_name(fullname_en: str):
-    for title in sorted(english_titles, key=len, reverse=True):
-        # Handle with dot, space, or joined directly (e.g., "MissSupharom")
-        if fullname_en.startswith(title + ".") or fullname_en.startswith(title + " "):
-            name_without_title = fullname_en[len(title):].strip(" .")
-        elif fullname_en.startswith(title):
-            name_without_title = fullname_en[len(title):].strip()
-        else:
-            continue
-
-        parts = name_without_title.split(maxsplit=1)
-        if len(parts) == 2:
-            return {
-                "title_en": title,
-                "first_name_en": parts[0],
-                "last_name_en": parts[1],
-                "full_name_en": f"{title} {parts[0]} {parts[1]}"
-            }
-        else:
-            return {
-                "title_en": title,
-                "first_name_en": name_without_title,
-                "last_name_en": "",
-                "full_name_en": f"{title} {name_without_title}"
-            }
-
-    # fallback
-    return {
-        "title_en": "",
-        "first_name_en": fullname_en,
-        "last_name_en": "",
-        "full_name_en": fullname_en
-    }
+    return _parse_name(fullname_en, ENGLISH_NAME_RE, "en")
 
